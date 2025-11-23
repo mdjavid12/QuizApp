@@ -15,22 +15,18 @@ ALGORITHM = "HS256"
 pwd = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2 = OAuth2PasswordBearer(tokenUrl="/login")
 
-# ---------------------------
-# Helper to avoid bcrypt 72 byte limit
-# ---------------------------
+
 def bcrypt_safe(password: str) -> str:
     """
     Truncate password to 72 characters to avoid bcrypt errors.
     """
     return password[:72]
 
-# ---------------------------
-# JWT helpers
-# ---------------------------
+
 def create_token(user: User):
     data = {
         "id": user.id,
-        "is_admin": user.is_admin,  # add admin flag here
+        "is_admin": user.is_admin,  
         "exp": datetime.utcnow() + timedelta(hours=5)
     }
     return jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
@@ -46,7 +42,7 @@ def get_current_user(token: str = Depends(oauth2), db: Session = Depends(get_db)
     user = db.query(User).filter(User.id == payload["id"]).first()
     if not user:
         raise HTTPException(401, "User not found")
-    user.is_admin = payload.get("is_admin", False)  # attach admin info
+    user.is_admin = payload.get("is_admin", False)  
     return user
 
 def admin_required(user: User = Depends(get_current_user)):
@@ -59,7 +55,7 @@ def register(email: str, password: str, db: Session = Depends(get_db)):
     if db.query(User).filter(User.email == email).first():
         raise HTTPException(400, "Email already registered")
 
-    hashed = pwd.hash(bcrypt_safe(password))  # truncate password
+    hashed = pwd.hash(bcrypt_safe(password))  
     user = User(email=email, password=hashed, is_admin=False)
     db.add(user)
     db.commit()
@@ -72,5 +68,5 @@ def login(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get
     if not user or not pwd.verify(bcrypt_safe(form.password), user.password):
         raise HTTPException(401, "Invalid credentials")
 
-    token = create_token(user)  # pass the User object
+    token = create_token(user)  
     return {"accessToken": token}
