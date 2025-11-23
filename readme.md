@@ -15,11 +15,10 @@ cd QuizApp
 
 # Create virtual environment
 python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate  
 
 # Install dependencies
 pip install -r requirements.txt
 
 
-# Swagger UI
-http://127.0.0.1:8000/docs
+
