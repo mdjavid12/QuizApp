@@ -17,9 +17,7 @@ oauth2 = OAuth2PasswordBearer(tokenUrl="/login")
 
 
 def bcrypt_safe(password: str) -> str:
-    """
-    Truncate password to 72 characters to avoid bcrypt errors.
-    """
+    
     return password[:72]
 
 
